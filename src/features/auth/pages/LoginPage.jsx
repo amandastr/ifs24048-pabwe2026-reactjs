@@ -29,6 +29,7 @@ export default function LoginPage() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <IconInput
+        id="login-email-input"
         label="Alamat Email"
         icon={IconMail}
         type="email"
@@ -38,6 +39,7 @@ export default function LoginPage() {
         placeholder="nama@email.com"
       />
       <IconInput
+        id="login-password-input"
         label="Kata Sandi"
         icon={IconLock}
         type="password"
@@ -47,6 +49,7 @@ export default function LoginPage() {
         placeholder="••••••••"
       />
       <button
+        id="login-submit-button"
         type="submit"
         disabled={loading}
         className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 disabled:opacity-60"
