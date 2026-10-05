@@ -52,7 +52,7 @@ export default function NavbarComponent({ profile, onToggleSidebar }) {
             </span>
             <span className="block text-xs text-slate-500">{profile?.email}</span>
           </span>
-          <IconChevronDown size={16} className="text-slate-400" />
+          <IconChevronDown size={16} className="text-slate-600" />
         </button>
 
         {open && (
