@@ -1,3 +1,4 @@
+jsx
 import { useEffect, useState } from "react";
 import { apiRequest } from "../../../helpers/apiHelper";
 
@@ -19,8 +20,10 @@ export default function UsersPage() {
   );
 
   return (
-    <main className="flex flex-col gap-4">
-      <h1 className="text-2xl font-extrabold">Daftar Pengguna</h1>
+    <div className="flex flex-col gap-4">
+      <h1 className="text-2xl font-extrabold">
+        Daftar Pengguna
+      </h1>
 
       <input
         value={keyword}
@@ -56,7 +59,9 @@ export default function UsersPage() {
             </div>
 
             <div className="min-w-0">
-              <p className="truncate font-semibold">{user.name}</p>
+              <p className="truncate font-semibold">
+                {user.name}
+              </p>
               <p className="truncate text-sm text-slate-500">
                 {user.email}
               </p>
@@ -64,6 +69,6 @@ export default function UsersPage() {
           </div>
         ))}
       </div>
-    </main>
+    </div>
   );
 }
