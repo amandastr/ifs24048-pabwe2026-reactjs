@@ -1,33 +1,44 @@
-import Swal from "sweetalert2";
-
 const CONFIRM_COLOR = "#4f46e5";
 
-export const showSuccessDialog = (message, title = "Berhasil") =>
-  Swal.fire({
+// SweetAlert2 dimuat hanya saat dialog pertama kali dibutuhkan
+const loadSwal = async () => {
+  const { default: Swal } = await import("sweetalert2");
+  return Swal;
+};
+
+export const showSuccessDialog = async (message, title = "Berhasil") => {
+  const Swal = await loadSwal();
+  return Swal.fire({
     icon: "success",
     title,
     text: message,
     confirmButtonColor: CONFIRM_COLOR,
   });
+};
 
-export const showErrorDialog = (message, title = "Gagal") =>
-  Swal.fire({
+export const showErrorDialog = async (message, title = "Gagal") => {
+  const Swal = await loadSwal();
+  return Swal.fire({
     icon: "error",
     title,
     text: message,
     confirmButtonColor: CONFIRM_COLOR,
   });
+};
 
-export const showWarningDialog = (message, title = "Perhatian") =>
-  Swal.fire({
+export const showWarningDialog = async (message, title = "Perhatian") => {
+  const Swal = await loadSwal();
+  return Swal.fire({
     icon: "warning",
     title,
     text: message,
     confirmButtonColor: CONFIRM_COLOR,
   });
+};
 
 // Mengembalikan true jika pengguna menekan tombol konfirmasi
 export const showConfirmDialog = async (message, title = "Konfirmasi") => {
+  const Swal = await loadSwal();
   const result = await Swal.fire({
     icon: "question",
     title,

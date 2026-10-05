@@ -15,6 +15,25 @@ export default defineConfig(({ mode }) => {
     preview: {
       port: Number(env.APP_PORT) || 3000,
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes("node_modules")) return;
+            if (
+              /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|scheduler)[\\/]/.test(id)
+            ) {
+              return "react-vendor";
+            }
+            if (
+              /[\\/]node_modules[\\/](@reduxjs|react-redux|redux|reselect|immer)[\\/]/.test(id)
+            ) {
+              return "state-vendor";
+            }
+          },
+        },
+      },
+    },
     define: {
       DELCOM_BASEURL: JSON.stringify(
         env.VITE_DELCOM_BASEURL || "https://open-api.delcom.org/api/v1"
