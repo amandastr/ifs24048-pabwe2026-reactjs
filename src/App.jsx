@@ -2,11 +2,11 @@ import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router-dom";
 
 import AuthLayout from "./features/auth/layouts/AuthLayout";
+import LoginPage from "./features/auth/pages/LoginPage";
+import RegisterPage from "./features/auth/pages/RegisterPage";
 import LostFoundLayout from "./features/lost-founds/layouts/LostFoundLayout";
 import HomePage from "./features/lost-founds/pages/HomePage";
 
-const LoginPage = lazy(() => import("./features/auth/pages/LoginPage"));
-const RegisterPage = lazy(() => import("./features/auth/pages/RegisterPage"));
 const DetailPage = lazy(() => import("./features/lost-founds/pages/DetailPage"));
 const StatsPage = lazy(() => import("./features/lost-founds/pages/StatsPage"));
 const UsersPage = lazy(() => import("./features/users/pages/UsersPage"));
