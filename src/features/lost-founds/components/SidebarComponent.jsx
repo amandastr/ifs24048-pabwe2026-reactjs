@@ -5,7 +5,7 @@ import {
   IconUserCircle,
   IconUsers,
 } from "@tabler/icons-react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 const menus = [
   { to: "/", label: "Dashboard / Laporan", icon: IconLayoutDashboard, end: true },
@@ -15,6 +15,8 @@ const menus = [
 ];
 
 export default function SidebarComponent({ open, onClose }) {
+  const { pathname } = useLocation();
+
   return (
     <>
       {open && (
@@ -38,7 +40,7 @@ export default function SidebarComponent({ open, onClose }) {
                 onClick={onClose}
                 className={({ isActive }) =>
                   `flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold ${
-                    isActive
+                    isActive || (to === "/" && pathname.startsWith("/lost-founds"))
                       ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200"
                       : "text-slate-700 hover:bg-slate-100"
                   }`
@@ -49,7 +51,9 @@ export default function SidebarComponent({ open, onClose }) {
                     <span className="flex items-center gap-3">
                       <Icon size={20} /> {label}
                     </span>
-                    {isActive && <IconChevronRight size={16} />}
+                    {(isActive || (to === "/" && pathname.startsWith("/lost-founds"))) && (
+                      <IconChevronRight size={16} />
+                    )}
                   </>
                 )}
               </NavLink>

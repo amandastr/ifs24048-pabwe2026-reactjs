@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { IconLock, IconLogin2, IconMail } from "@tabler/icons-react";
-import { showErrorDialog } from "../../../helpers/toolsHelper";
+import Swal from "sweetalert2";
 import { asyncAuthLogin } from "../states/action";
 import IconInput from "../components/IconInput";
 
@@ -20,7 +20,7 @@ export default function LoginPage() {
       await dispatch(asyncAuthLogin({ email, password })).unwrap();
       navigate("/");
     } catch (error) {
-     showErrorDialog(String(error), "Login gagal"); 
+      Swal.fire({ icon: "error", title: "Login gagal", text: String(error) });
     } finally {
       setLoading(false);
     }
@@ -30,6 +30,7 @@ export default function LoginPage() {
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <IconInput
         id="login-email-input"
+        name="email"
         label="Alamat Email"
         icon={IconMail}
         type="email"
@@ -40,6 +41,7 @@ export default function LoginPage() {
       />
       <IconInput
         id="login-password-input"
+        name="password"
         label="Kata Sandi"
         icon={IconLock}
         type="password"

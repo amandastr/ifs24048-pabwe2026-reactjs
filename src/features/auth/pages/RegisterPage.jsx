@@ -36,6 +36,8 @@ export default function RegisterPage() {
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       <IconInput
+        id="register-name-input"
+        name="name"
         label="Nama Lengkap"
         icon={IconUser}
         required
@@ -44,6 +46,8 @@ export default function RegisterPage() {
         placeholder="Nama kamu"
       />
       <IconInput
+        id="register-email-input"
+        name="email"
         label="Alamat Email"
         icon={IconMail}
         type="email"
@@ -53,6 +57,8 @@ export default function RegisterPage() {
         placeholder="nama@email.com"
       />
       <IconInput
+        id="register-password-input"
+        name="password"
         label="Kata Sandi"
         icon={IconLock}
         type="password"
@@ -62,6 +68,7 @@ export default function RegisterPage() {
         placeholder="Minimal 6 karakter"
       />
       <button
+        id="register-submit-button"
         type="submit"
         disabled={loading}
         className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 disabled:opacity-60"

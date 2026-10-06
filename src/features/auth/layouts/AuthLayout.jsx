@@ -1,73 +1,43 @@
-jsx
-import { useEffect, useState } from "react";
-import { apiRequest } from "../../../helpers/apiHelper";
+import { IconMapSearch } from "@tabler/icons-react";
+import { NavLink, Navigate, Outlet } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-export default function UsersPage() {
-  const [users, setUsers] = useState([]);
-  const [keyword, setKeyword] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+const tab = ({ isActive }) =>
+  `rounded-lg px-4 py-2.5 text-center text-sm font-bold transition ${
+    isActive ? "bg-white text-indigo-700 shadow-sm" : "text-slate-700"
+  }`;
 
-  useEffect(() => {
-    apiRequest("/users")
-      .then((json) => setUsers(json.data?.users ?? []))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+export default function AuthLayout() {
+  const isAuthLogin = useSelector((state) => state.auth.isAuthLogin);
 
-  const filtered = users.filter((u) =>
-    `${u.name} ${u.email}`.toLowerCase().includes(keyword.toLowerCase())
-  );
+  if (isAuthLogin) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-extrabold">
-        Daftar Pengguna
-      </h1>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-50 via-white to-indigo-50 p-4">
+      <div className="mb-8 flex flex-col items-center text-center">
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-indigo-200">
+          <IconMapSearch size={30} />
+        </div>
+        <h1 className="text-3xl font-extrabold tracking-tight">
+          Delcom Lost &amp; Founds
+        </h1>
+        <p className="mt-1 text-slate-500">
+          Laporkan dan temukan barang hilang dengan mudah
+        </p>
+      </div>
 
-      <input
-        value={keyword}
-        onChange={(e) => setKeyword(e.target.value)}
-        placeholder="Cari pengguna..."
-        className="max-w-sm rounded-lg border border-slate-300 bg-white px-3 py-2"
-      />
-
-      {loading && (
-        <p className="text-sm text-slate-500">Memuat...</p>
-      )}
-
-      {error && (
-        <p className="text-sm text-red-600">{error}</p>
-      )}
-
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        {filtered.map((user) => (
-          <div
-            key={user.id}
-            className="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm"
-          >
-            <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-indigo-100 font-bold text-indigo-700">
-              {user.photo ? (
-                <img
-                  src={user.photo}
-                  alt={user.name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                user.name?.charAt(0).toUpperCase()
-              )}
-            </div>
-
-            <div className="min-w-0">
-              <p className="truncate font-semibold">
-                {user.name}
-              </p>
-              <p className="truncate text-sm text-slate-500">
-                {user.email}
-              </p>
-            </div>
-          </div>
-        ))}
+      <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-xl shadow-slate-200/70">
+        <div className="mb-6 grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1">
+          <NavLink to="/auth/login" className={tab}>
+            Masuk Akun
+          </NavLink>
+          <NavLink to="/auth/register" className={tab}>
+            Daftar Baru
+          </NavLink>
+        </div>
+        <Outlet />
       </div>
     </div>
   );

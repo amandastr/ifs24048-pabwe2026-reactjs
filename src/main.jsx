@@ -5,7 +5,6 @@ import { BrowserRouter } from "react-router-dom";
 
 import store from "./store";
 import App from "./App";
-import "@fontsource-variable/plus-jakarta-sans";
 import "./index.css";
 
 createRoot(document.getElementById("root")).render(

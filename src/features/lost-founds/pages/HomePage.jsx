@@ -40,7 +40,7 @@ const Segment = ({ options, value, onChange }) => (
 const TypeBadge = ({ status }) => (
   <span
     className={`inline-block rounded-full px-3 py-1 text-xs font-bold ${
-      status === "lost" ? "bg-rose-50 text-rose-700" : "bg-sky-50 text-sky-700"
+      status === "lost" ? "bg-rose-50 text-rose-600" : "bg-sky-50 text-sky-700"
     }`}
   >
     {status === "lost" ? "Hilang" : "Ditemukan"}
@@ -80,9 +80,9 @@ export default function HomePage() {
   const stats = useMemo(
     () => [
       ["Total Laporan", lostFounds.length, "text-slate-900", "bg-indigo-50 text-indigo-600", IconListDetails],
-      ["Barang Hilang", lostFounds.filter((i) => i.status === "lost").length, "text-rose-700", "bg-rose-50 text-rose-700", IconSearch],
-      ["Barang Ditemukan", lostFounds.filter((i) => i.status === "found").length, "text-sky-600", "bg-sky-50 text-sky-600", IconBox],
-      ["Selesai", lostFounds.filter(isDone).length, "text-emerald-700", "bg-emerald-50 text-emerald-700", IconCircleCheck],
+      ["Barang Hilang", lostFounds.filter((i) => i.status === "lost").length, "text-rose-600", "bg-rose-50 text-rose-600", IconSearch],
+      ["Barang Ditemukan", lostFounds.filter((i) => i.status === "found").length, "text-blue-600", "bg-sky-50 text-sky-600", IconBox],
+      ["Selesai", lostFounds.filter(isDone).length, "text-emerald-600", "bg-emerald-50 text-emerald-600", IconCircleCheck],
     ],
     [lostFounds]
   );
@@ -156,7 +156,7 @@ export default function HomePage() {
         <div className="flex flex-col gap-4 p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="relative min-w-60 flex-1 md:max-w-xl">
-              <IconSearch size={18} className="absolute top-1/2 left-4 -translate-y-1/2 text-slate-600" />
+              <IconSearch size={18} className="absolute top-1/2 left-4 -translate-y-1/2 text-slate-400" />
               <input
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
@@ -240,7 +240,7 @@ export default function HomePage() {
                 {item.cover ? (
                   <img src={item.cover} alt={item.title} className="h-40 w-full object-cover" />
                 ) : (
-                  <div className="flex h-40 items-center justify-center bg-slate-100 text-sm text-slate-600">Tanpa foto</div>
+                  <div className="flex h-40 items-center justify-center bg-slate-100 text-sm text-slate-400">Tanpa foto</div>
                 )}
                 <div className="flex flex-col gap-3 p-4">
                   <div className="flex gap-2"><TypeBadge status={item.status} /><StateBadge done={isDone(item)} /></div>

@@ -71,7 +71,7 @@ export default function DetailPage() {
           <button type="button" onClick={() => setShowChange(true)} className={`${btn} border-amber-200 bg-amber-50 text-amber-700`}>
             <IconEdit size={18} /> Ubah Data
           </button>
-          <button type="button" onClick={handleDelete} className={`${btn} border-rose-200 bg-rose-50 text-rose-700`}>
+          <button type="button" onClick={handleDelete} className={`${btn} border-rose-200 bg-rose-50 text-rose-600`}>
             <IconTrash size={18} /> Hapus
           </button>
         </div>
@@ -83,8 +83,8 @@ export default function DetailPage() {
         )}
         <div className="flex flex-col gap-4 p-8">
           <div className="flex flex-wrap items-center gap-2 text-xs font-bold">
-            <span className="text-slate-600">#{item.id}</span>
-            <span className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 ${isLost ? "bg-rose-50 text-rose-700" : "bg-sky-50 text-sky-700"}`}>
+            <span className="text-slate-400">#{item.id}</span>
+            <span className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 ${isLost ? "bg-rose-50 text-rose-600" : "bg-sky-50 text-sky-700"}`}>
               {isLost ? <IconSearch size={14} /> : <IconBox size={14} />}
               {isLost ? "Barang Hilang" : "Barang Ditemukan"}
             </span>
