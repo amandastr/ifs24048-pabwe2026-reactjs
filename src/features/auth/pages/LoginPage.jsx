@@ -4,7 +4,13 @@ import { useNavigate } from "react-router-dom";
 import { IconLock, IconLogin2, IconMail } from "@tabler/icons-react";
 import { showErrorDialog } from "../../../helpers/toolsHelper";
 import { asyncAuthLogin } from "../states/action";
-import IconInput from "../components/IconInput";
+
+const wrapper =
+  "flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100";
+const labelClass =
+  "text-xs font-bold tracking-wider text-slate-600 uppercase";
+const inputClass =
+  "w-full bg-transparent text-sm outline-none placeholder:text-slate-400";
 
 export default function LoginPage() {
   const dispatch = useDispatch();
@@ -20,7 +26,7 @@ export default function LoginPage() {
       await dispatch(asyncAuthLogin({ email, password })).unwrap();
       navigate("/");
     } catch (error) {
-     showErrorDialog(String(error), "Login gagal"); 
+      showErrorDialog(String(error), "Login gagal");
     } finally {
       setLoading(false);
     }
@@ -28,26 +34,44 @@ export default function LoginPage() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      <IconInput
-        id="login-email-input"
-        label="Alamat Email"
-        icon={IconMail}
-        type="email"
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="nama@email.com"
-      />
-      <IconInput
-        id="login-password-input"
-        label="Kata Sandi"
-        icon={IconLock}
-        type="password"
-        required
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="••••••••"
-      />
+      <div className="flex flex-col gap-2">
+        <label htmlFor="login-email-input" className={labelClass}>
+          Alamat Email
+        </label>
+        <div className={wrapper}>
+          <IconMail size={18} className="text-slate-400" />
+          <input
+            id="login-email-input"
+            name="email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="nama@email.com"
+            className={inputClass}
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <label htmlFor="login-password-input" className={labelClass}>
+          Kata Sandi
+        </label>
+        <div className={wrapper}>
+          <IconLock size={18} className="text-slate-400" />
+          <input
+            id="login-password-input"
+            name="password"
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+            className={inputClass}
+          />
+        </div>
+      </div>
+
       <button
         id="login-submit-button"
         type="submit"
