@@ -13,65 +13,46 @@ describe("lostFoundApi", () => {
     apiRequest.mockReset();
   });
 
-  describe("getAll", () => {
-    it("memanggil GET /lost-founds dengan params kosong secara default", async () => {
+  describe("getLostFounds", () => {
+    it("memanggil GET /lost-founds tanpa filter", async () => {
       apiRequest.mockResolvedValue({ data: { lost_founds: [item] } });
 
-      const result = await lostFoundApi.getAll();
+      const result = await lostFoundApi.getLostFounds();
 
-      expect(apiRequest).toHaveBeenCalledWith("/lost-founds", { params: {} });
+      expect(apiRequest).toHaveBeenCalledWith("/lost-founds", {
+        params: { status: undefined, is_completed: undefined, is_me: undefined },
+      });
       expect(result).toEqual([item]);
     });
 
-    it("meneruskan params filter apa adanya", async () => {
+    it("meneruskan filter status, is_completed, dan is_me", async () => {
       apiRequest.mockResolvedValue({ data: { lost_founds: [] } });
-      const params = { status: "found", is_completed: 0, is_me: 1 };
 
-      await lostFoundApi.getAll(params);
+      await lostFoundApi.getLostFounds({
+        status: "found",
+        isCompleted: 0,
+        isMe: 1,
+      });
 
-      expect(apiRequest).toHaveBeenCalledWith("/lost-founds", { params });
-    });
-
-    it("mengembalikan array kosong jika response tidak memuat data", async () => {
-      apiRequest.mockResolvedValue({});
-
-      expect(await lostFoundApi.getAll()).toEqual([]);
-    });
-
-    it("mengembalikan array kosong jika data tidak memuat lost_founds", async () => {
-      apiRequest.mockResolvedValue({ data: {} });
-
-      expect(await lostFoundApi.getAll()).toEqual([]);
+      expect(apiRequest).toHaveBeenCalledWith("/lost-founds", {
+        params: { status: "found", is_completed: 0, is_me: 1 },
+      });
     });
   });
 
-  describe("getById", () => {
-    it("memanggil GET /lost-founds/:id dan mengembalikan laporan", async () => {
-      apiRequest.mockResolvedValue({ data: { lost_found: item } });
+  it("getLostFound memanggil GET /lost-founds/:id", async () => {
+    apiRequest.mockResolvedValue({ data: { lost_found: item } });
 
-      const result = await lostFoundApi.getById(5);
+    const result = await lostFoundApi.getLostFound(5);
 
-      expect(apiRequest).toHaveBeenCalledWith("/lost-founds/5");
-      expect(result).toEqual(item);
-    });
-
-    it("mengembalikan null jika response tidak memuat data", async () => {
-      apiRequest.mockResolvedValue({});
-
-      expect(await lostFoundApi.getById(5)).toBeNull();
-    });
-
-    it("mengembalikan null jika data tidak memuat lost_found", async () => {
-      apiRequest.mockResolvedValue({ data: {} });
-
-      expect(await lostFoundApi.getById(5)).toBeNull();
-    });
+    expect(apiRequest).toHaveBeenCalledWith("/lost-founds/5");
+    expect(result).toEqual(item);
   });
 
-  it("add memanggil POST /lost-founds hanya dengan title, description, status", async () => {
+  it("addLostFound memanggil POST /lost-founds dan mengembalikan id baru", async () => {
     apiRequest.mockResolvedValue({ data: { lost_found_id: 12 } });
 
-    const result = await lostFoundApi.add({
+    const result = await lostFoundApi.addLostFound({
       title: "Dompet",
       description: "Warna hitam",
       status: "lost",
@@ -82,79 +63,95 @@ describe("lostFoundApi", () => {
       method: "POST",
       body: { title: "Dompet", description: "Warna hitam", status: "lost" },
     });
-    expect(result).toEqual({ lost_found_id: 12 });
+    expect(result).toBe(12);
   });
 
-  it("change memanggil PUT /lost-founds/:id beserta is_completed", async () => {
-    apiRequest.mockResolvedValue({ data: null });
+  describe("updateLostFound", () => {
+    it("mengirim is_completed 1 jika isCompleted true", async () => {
+      apiRequest.mockResolvedValue({ message: "Berhasil mengubah data" });
 
-    const result = await lostFoundApi.change(3, {
-      title: "Dompet",
-      description: "Warna hitam",
-      status: "found",
-      is_completed: 1,
-      ekstra: "diabaikan",
-    });
-
-    expect(apiRequest).toHaveBeenCalledWith("/lost-founds/3", {
-      method: "PUT",
-      body: {
+      const result = await lostFoundApi.updateLostFound(3, {
         title: "Dompet",
         description: "Warna hitam",
         status: "found",
-        is_completed: 1,
-      },
+        isCompleted: true,
+      });
+
+      expect(apiRequest).toHaveBeenCalledWith("/lost-founds/3", {
+        method: "PUT",
+        body: {
+          title: "Dompet",
+          description: "Warna hitam",
+          status: "found",
+          is_completed: 1,
+        },
+      });
+      expect(result).toBe("Berhasil mengubah data");
     });
-    expect(result).toBeNull();
+
+    it("mengirim is_completed 0 jika isCompleted false", async () => {
+      apiRequest.mockResolvedValue({ message: "ok" });
+
+      await lostFoundApi.updateLostFound(3, {
+        title: "Dompet",
+        description: "Warna hitam",
+        status: "lost",
+        isCompleted: false,
+      });
+
+      expect(apiRequest.mock.calls[0][1].body.is_completed).toBe(0);
+    });
   });
 
-  it("changeCover mengirim FormData berisi field cover", async () => {
-    apiRequest.mockResolvedValue({ data: { cover: "img/cover.jpg" } });
+  it("updateCover mengirim FormData berisi field cover", async () => {
+    apiRequest.mockResolvedValue({ message: "Berhasil mengubah cover" });
     const file = new File(["x"], "cover.jpg", { type: "image/jpeg" });
 
-    const result = await lostFoundApi.changeCover(4, file);
+    const result = await lostFoundApi.updateCover(4, file);
 
     const [path, options] = apiRequest.mock.calls[0];
     expect(path).toBe("/lost-founds/4/cover");
     expect(options.method).toBe("POST");
     expect(options.body).toBeInstanceOf(FormData);
     expect(options.body.get("cover").name).toBe("cover.jpg");
-    expect(result).toEqual({ cover: "img/cover.jpg" });
+    expect(result).toBe("Berhasil mengubah cover");
   });
 
-  it("remove memanggil DELETE /lost-founds/:id", async () => {
-    apiRequest.mockResolvedValue({ data: null });
+  it("deleteLostFound memanggil DELETE /lost-founds/:id", async () => {
+    apiRequest.mockResolvedValue({ message: "Berhasil menghapus data" });
 
-    const result = await lostFoundApi.remove(9);
+    const result = await lostFoundApi.deleteLostFound(9);
 
     expect(apiRequest).toHaveBeenCalledWith("/lost-founds/9", {
       method: "DELETE",
     });
-    expect(result).toBeNull();
+    expect(result).toBe("Berhasil menghapus data");
   });
 
-  describe("getStats", () => {
+  describe("statistik", () => {
     const stats = { stats_losts: { "06-10-2024": 1 } };
 
-    it("memakai tipe daily dan params kosong secara default", async () => {
+    it("getStatsDaily memanggil /lost-founds/stats/daily tanpa opsi", async () => {
       apiRequest.mockResolvedValue({ data: stats });
 
-      const result = await lostFoundApi.getStats();
+      const result = await lostFoundApi.getStatsDaily();
 
       expect(apiRequest).toHaveBeenCalledWith("/lost-founds/stats/daily", {
-        params: {},
+        params: { end_date: undefined, total_data: undefined },
       });
       expect(result).toEqual(stats);
     });
 
-    it("meneruskan tipe dan params yang diberikan", async () => {
+    it("getStatsMonthly meneruskan end_date dan total_data sebagai query", async () => {
       apiRequest.mockResolvedValue({ data: stats });
-      const params = { end_date: "2024-10-05 22:00:00", total_data: 5 };
 
-      const result = await lostFoundApi.getStats("monthly", params);
+      const result = await lostFoundApi.getStatsMonthly({
+        endDate: "2024-10-05 22:00:00",
+        totalData: 5,
+      });
 
       expect(apiRequest).toHaveBeenCalledWith("/lost-founds/stats/monthly", {
-        params,
+        params: { end_date: "2024-10-05 22:00:00", total_data: 5 },
       });
       expect(result).toEqual(stats);
     });
@@ -163,6 +160,8 @@ describe("lostFoundApi", () => {
   it("meneruskan error dari apiRequest", async () => {
     apiRequest.mockRejectedValue(new Error("Data tidak valid"));
 
-    await expect(lostFoundApi.getById(1)).rejects.toThrow("Data tidak valid");
+    await expect(lostFoundApi.getLostFound(1)).rejects.toThrow(
+      "Data tidak valid"
+    );
   });
 });

@@ -4,60 +4,52 @@ import {
   asyncGetLostFound,
   asyncAddLostFound,
   asyncChangeLostFound,
-  asyncChangeCoverLostFound,
+  asyncChangeLostFoundCover,
   asyncDeleteLostFound,
-  asyncGetLostFoundStats,
+  asyncGetLostFoundStatsDaily,
+  asyncGetLostFoundStatsMonthly,
   resetLostFoundStatus,
 } from "./action";
 import lostFoundApi from "../api/lostFoundApi";
 
 vi.mock("../api/lostFoundApi", () => ({
   default: {
-    getAll: vi.fn(),
-    getById: vi.fn(),
-    add: vi.fn(),
-    change: vi.fn(),
-    changeCover: vi.fn(),
-    remove: vi.fn(),
-    getStats: vi.fn(),
+    getLostFounds: vi.fn(),
+    getLostFound: vi.fn(),
+    addLostFound: vi.fn(),
+    updateLostFound: vi.fn(),
+    updateCover: vi.fn(),
+    deleteLostFound: vi.fn(),
+    getStatsDaily: vi.fn(),
+    getStatsMonthly: vi.fn(),
   },
 }));
 
 const run = (thunk) => thunk(vi.fn(), vi.fn(), undefined);
 
 const file = new File(["x"], "cover.jpg", { type: "image/jpeg" });
-const filters = { status: "lost", is_completed: 0, is_me: 1 };
+const filters = { status: "lost", isCompleted: 0, isMe: 1 };
 const newData = { title: "Dompet", description: "Hitam", status: "lost" };
-const changeData = { ...newData, is_completed: 1 };
-const statsArg = { type: "monthly", params: { total_data: 3 } };
+const changeArg = { id: 3, ...newData, isCompleted: true };
+const coverArg = { id: 4, file };
+const statsOptions = { endDate: "2024-10-05 22:00:00", totalData: 7 };
 
 // [nama, thunk, method lostFoundApi, argumen thunk, argumen yang diteruskan ke API]
 const cases = [
-  ["asyncGetLostFounds", asyncGetLostFounds, "getAll", filters, [filters]],
-  ["asyncGetLostFound", asyncGetLostFound, "getById", 5, [5]],
-  ["asyncAddLostFound", asyncAddLostFound, "add", newData, [newData]],
+  ["asyncGetLostFounds", asyncGetLostFounds, "getLostFounds", filters, [filters]],
+  ["asyncGetLostFound", asyncGetLostFound, "getLostFound", 5, [5]],
+  ["asyncAddLostFound", asyncAddLostFound, "addLostFound", newData, [newData]],
   [
     "asyncChangeLostFound",
     asyncChangeLostFound,
-    "change",
-    { id: 3, ...changeData },
-    [3, changeData],
+    "updateLostFound",
+    changeArg,
+    [3, { ...newData, isCompleted: true }],
   ],
-  [
-    "asyncChangeCoverLostFound",
-    asyncChangeCoverLostFound,
-    "changeCover",
-    { id: 4, cover: file },
-    [4, file],
-  ],
-  ["asyncDeleteLostFound", asyncDeleteLostFound, "remove", 9, [9]],
-  [
-    "asyncGetLostFoundStats",
-    asyncGetLostFoundStats,
-    "getStats",
-    statsArg,
-    ["monthly", { total_data: 3 }],
-  ],
+  ["asyncChangeLostFoundCover", asyncChangeLostFoundCover, "updateCover", coverArg, [4, file]],
+  ["asyncDeleteLostFound", asyncDeleteLostFound, "deleteLostFound", 9, [9]],
+  ["asyncGetLostFoundStatsDaily", asyncGetLostFoundStatsDaily, "getStatsDaily", statsOptions, [statsOptions]],
+  ["asyncGetLostFoundStatsMonthly", asyncGetLostFoundStatsMonthly, "getStatsMonthly", statsOptions, [statsOptions]],
 ];
 
 describe("lost-founds action", () => {
@@ -88,14 +80,5 @@ describe("lost-founds action", () => {
       expect(thunk.rejected.match(result)).toBe(true);
       expect(result.payload).toBe("Gagal dari API");
     });
-  });
-
-  it("asyncGetLostFoundStats tanpa argumen memakai default API", async () => {
-    lostFoundApi.getStats.mockResolvedValue({});
-
-    const result = await run(asyncGetLostFoundStats());
-
-    expect(lostFoundApi.getStats).toHaveBeenCalledWith(undefined, undefined);
-    expect(asyncGetLostFoundStats.fulfilled.match(result)).toBe(true);
   });
 });
