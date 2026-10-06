@@ -1,41 +1,43 @@
 import { useEffect, useState } from "react";
-import Swal from "sweetalert2";
-import { apiRequest } from "../../../helpers/apiHelper";
-
-const showError = (error) =>
-  Swal.fire({ icon: "error", title: "Gagal", text: error.message });
+import { useDispatch, useSelector } from "react-redux";
+import {
+  showErrorDialog,
+  showSuccessDialog,
+  showWarningDialog,
+} from "../../../helpers/toolsHelper";
+import {
+  asyncChangeProfile,
+  asyncChangeProfilePassword,
+  asyncChangeProfilePhoto,
+  asyncGetProfile,
+} from "../states/action";
 
 export default function ProfilePage() {
+  const dispatch = useDispatch();
+  const profile = useSelector((state) => state.users.profile);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [photo, setPhoto] = useState(null);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-
-  const loadProfile = () =>
-    apiRequest("/users/me")
-      .then((json) => {
-        const user = json.data?.user;
-        setName(user?.name ?? "");
-        setEmail(user?.email ?? "");
-        setPhoto(user?.photo ?? null);
-      })
-      .catch(showError);
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   useEffect(() => {
-    loadProfile();
-  }, []);
+    dispatch(asyncGetProfile());
+  }, [dispatch]);
+
+  // Isi form dengan data profil terbaru
+  useEffect(() => {
+    setName(profile?.name ?? "");
+    setEmail(profile?.email ?? "");
+  }, [profile]);
 
   const handleProfile = async (e) => {
     e.preventDefault();
     try {
-      await apiRequest("/users/me", {
-        method: "PUT",
-        body: { name, email },
-      });
-      Swal.fire({ icon: "success", title: "Profil diperbarui" });
+      await dispatch(asyncChangeProfile({ name, email })).unwrap();
+      await showSuccessDialog("Profil diperbarui");
     } catch (error) {
-      showError(error);
+      await showErrorDialog(String(error));
     }
   };
 
@@ -43,38 +45,39 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const body = new FormData();
-    body.append("photo", file);
-
     try {
-      await apiRequest("/users/me/photo", {
-        method: "POST",
-        body,
-      });
-      await loadProfile();
-      Swal.fire({ icon: "success", title: "Foto diperbarui" });
+      await dispatch(asyncChangeProfilePhoto(file)).unwrap();
+      await dispatch(asyncGetProfile());
+      await showSuccessDialog("Foto diperbarui");
     } catch (error) {
-      showError(error);
+      await showErrorDialog(String(error));
     }
   };
 
   const handlePassword = async (e) => {
     e.preventDefault();
+
+    if (newPassword !== confirmPassword) {
+      await showWarningDialog("Konfirmasi kata sandi baru tidak sama");
+      return;
+    }
+
     try {
-      await apiRequest("/users/me/password", {
-        method: "PUT",
-        body: {
+      await dispatch(
+        asyncChangeProfilePassword({
           password: oldPassword,
-          new_password: newPassword,
-        },
-      });
+          newPassword,
+          newPasswordConfirmation: confirmPassword,
+        })
+      ).unwrap();
 
       setOldPassword("");
       setNewPassword("");
+      setConfirmPassword("");
 
-      Swal.fire({ icon: "success", title: "Kata sandi diubah" });
+      await showSuccessDialog("Kata sandi diubah");
     } catch (error) {
-      showError(error);
+      await showErrorDialog(String(error));
     }
   };
 
@@ -88,9 +91,9 @@ export default function ProfilePage() {
 
       <div className="flex items-center gap-4 rounded-xl bg-white p-5 shadow-sm">
         <div className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-indigo-100 text-xl font-bold text-indigo-700">
-          {photo ? (
+          {profile?.photo ? (
             <img
-              src={photo}
+              src={profile.photo}
               alt={name}
               className="h-full w-full object-cover"
             />
@@ -142,6 +145,7 @@ export default function ProfilePage() {
         <h2 className="font-bold">Ubah Kata Sandi</h2>
 
         <input
+          aria-label="Kata sandi lama"
           required
           type="password"
           value={oldPassword}
@@ -151,11 +155,22 @@ export default function ProfilePage() {
         />
 
         <input
+          aria-label="Kata sandi baru"
           required
           type="password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
           placeholder="Kata sandi baru"
+          className={input}
+        />
+
+        <input
+          aria-label="Konfirmasi kata sandi baru"
+          required
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Konfirmasi kata sandi baru"
           className={input}
         />
 

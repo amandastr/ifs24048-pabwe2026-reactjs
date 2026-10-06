@@ -7,6 +7,8 @@ import RegisterPage from "./features/auth/pages/RegisterPage";
 import LostFoundLayout from "./features/lost-founds/layouts/LostFoundLayout";
 import HomePage from "./features/lost-founds/pages/HomePage";
 
+// Halaman login dan register dimuat langsung agar form sudah ada saat halaman tampil.
+// Halaman dashboard lainnya dimuat saat dibutuhkan (lazy).
 const DetailPage = lazy(() => import("./features/lost-founds/pages/DetailPage"));
 const StatsPage = lazy(() => import("./features/lost-founds/pages/StatsPage"));
 const UsersPage = lazy(() => import("./features/users/pages/UsersPage"));

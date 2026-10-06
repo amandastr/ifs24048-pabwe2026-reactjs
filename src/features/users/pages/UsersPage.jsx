@@ -1,19 +1,15 @@
-jsx
 import { useEffect, useState } from "react";
-import { apiRequest } from "../../../helpers/apiHelper";
+import { useDispatch, useSelector } from "react-redux";
+import { asyncGetUsers } from "../states/action";
 
 export default function UsersPage() {
-  const [users, setUsers] = useState([]);
+  const dispatch = useDispatch();
+  const { users, isLoading, error } = useSelector((state) => state.users);
   const [keyword, setKeyword] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    apiRequest("/users")
-      .then((json) => setUsers(json.data?.users ?? []))
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
-  }, []);
+    dispatch(asyncGetUsers());
+  }, [dispatch]);
 
   const filtered = users.filter((u) =>
     `${u.name} ${u.email}`.toLowerCase().includes(keyword.toLowerCase())
@@ -26,18 +22,23 @@ export default function UsersPage() {
       </h1>
 
       <input
+        aria-label="Cari pengguna"
         value={keyword}
         onChange={(e) => setKeyword(e.target.value)}
         placeholder="Cari pengguna..."
         className="max-w-sm rounded-lg border border-slate-300 bg-white px-3 py-2"
       />
 
-      {loading && (
+      {isLoading && (
         <p className="text-sm text-slate-500">Memuat...</p>
       )}
 
       {error && (
         <p className="text-sm text-red-600">{error}</p>
+      )}
+
+      {!isLoading && !error && filtered.length === 0 && (
+        <p className="text-sm text-slate-500">Pengguna tidak ditemukan.</p>
       )}
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">

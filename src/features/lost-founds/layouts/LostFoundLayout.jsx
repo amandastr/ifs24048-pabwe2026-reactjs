@@ -1,21 +1,19 @@
 import { useEffect, useState } from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { apiRequest } from "../../../helpers/apiHelper";
+import { useDispatch, useSelector } from "react-redux";
+import { asyncGetProfile } from "../../users/states/action";
 import NavbarComponent from "../components/NavbarComponent";
 import SidebarComponent from "../components/SidebarComponent";
 
 export default function LostFoundLayout() {
+  const dispatch = useDispatch();
   const isAuthLogin = useSelector((state) => state.auth.isAuthLogin);
-  const [profile, setProfile] = useState(null);
+  const profile = useSelector((state) => state.users.profile);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (!isAuthLogin) return;
-    apiRequest("/users/me")
-      .then((json) => setProfile(json.data?.user ?? null))
-      .catch(() => setProfile(null));
-  }, [isAuthLogin]);
+    if (isAuthLogin) dispatch(asyncGetProfile());
+  }, [dispatch, isAuthLogin]);
 
   if (!isAuthLogin) {
     return <Navigate to="/auth/login" replace />;
