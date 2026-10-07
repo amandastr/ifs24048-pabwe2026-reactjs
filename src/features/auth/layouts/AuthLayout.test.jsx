@@ -42,8 +42,10 @@ describe("AuthLayout", () => {
   it("menandai tab aktif pada alamat login", () => {
     renderLayout("/auth/login");
 
-    expect(screen.getByRole("link", { name: "Masuk" })).toHaveClass("bg-white");
-    expect(screen.getByRole("link", { name: "Daftar" })).not.toHaveClass(
+    expect(screen.getByRole("link", { name: "Masuk Akun" })).toHaveClass(
+      "bg-white"
+    );
+    expect(screen.getByRole("link", { name: "Daftar Baru" })).not.toHaveClass(
       "bg-white"
     );
   });
@@ -52,8 +54,10 @@ describe("AuthLayout", () => {
     renderLayout("/auth/register");
 
     expect(screen.getByText("isi register")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Daftar" })).toHaveClass("bg-white");
-    expect(screen.getByRole("link", { name: "Masuk" })).not.toHaveClass(
+    expect(screen.getByRole("link", { name: "Daftar Baru" })).toHaveClass(
+      "bg-white"
+    );
+    expect(screen.getByRole("link", { name: "Masuk Akun" })).not.toHaveClass(
       "bg-white"
     );
   });
